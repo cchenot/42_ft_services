@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress
+  labels:
+    app: ft-services
+    tier: wordpress
+spec:
+  selector:
+    app: ft-services
+    tier: wordpress
+  ports:
+  - port: 5050
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wordpress-pv-claim
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ft-services
+    tier: wordpress
+  name: wordpress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ft-services
+      tier: wordpress
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: ft-services
+        tier: wordpress
+    spec:
+      restartPolicy: Always
+      containers:
+      - image: my-wordpress
+        name: wordpress
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5050
+          hostPort: 5050
+          name: wordpress
+        env:
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: wordpress
+              key: host
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: wordpress
+              key: name
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: wordpress
+              key: user
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: wordpress
+              key: password
+        volumeMounts:
+        - name: wordpress-persistent-storage
+          mountPath: /var/www/wordpress
+      volumes:
+      - name: wordpress-persistent-storage
+        persistentVolumeClaim:
+          claimName: wordpress-pv-claim

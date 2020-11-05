@@ -1,0 +1,4 @@
+addresse minikube a changer dans:
+- ftps : start.sh
+- grafana.db
+- wordpress.sql

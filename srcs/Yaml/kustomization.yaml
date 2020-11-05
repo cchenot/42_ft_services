@@ -1,0 +1,36 @@
+secretGenerator:
+- name: ssh
+  literals:
+    - username=admin
+    - password=pwdssh
+- name: mysql
+  literals:
+    - username=root
+    - password=root
+- name: wordpress
+  literals:
+    - host=mysql
+    - name=wordpress
+    - user=root
+    - password=root
+- name: ftps
+  literals:
+    - username=ftpuser
+    - password=pwdftp
+- name: phpmyadmin
+  literals:
+    - host=mysql
+    - port=3306
+    - username=root
+    - password=root
+
+resources:
+  - my-nginx.yaml
+  - ingress.yaml
+  - my-mysql.yaml
+  - my-wordpress.yaml
+  - my-ftps.yaml
+  - my-phpmyadmin.yaml
+  - my-influxdb.yaml
+  - my-telegraf.yaml
+  - my-grafana.yaml

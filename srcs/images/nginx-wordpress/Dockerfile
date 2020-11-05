@@ -1,0 +1,25 @@
+FROM alpine:latest
+
+RUN apk update && apk add --no-cache --upgrade bash
+RUN apk add php7 php7-fpm php7-opcache php7-gd php7-mysqli php7-zlib php7-curl php7-json php7-session php7-mbstring
+RUN apk add wget mysql mysql-client
+
+RUN apk add nginx && mkdir -p /run/nginx
+RUN adduser -D -g 'www' www
+RUN mkdir -p /var/www/nginx/wordpress
+RUN chown -R www:www /var/lib/nginx && chown -R www:www /var/www/nginx/wordpress
+
+#RUN wget https://wordpress.org/latest.tar.gz && tar -xvf latest.tar.gz
+RUN wget https://fr.wordpress.org/latest-fr_FR.tar.gz && tar -xvf latest-fr_FR.tar.gz
+
+RUN rm -rf /var/cache/apk/*
+
+COPY /wp-config.php /wp-config.php
+COPY /nginx.conf /etc/nginx/nginx.conf
+COPY /start.sh /start.sh
+
+RUN chmod +x start.sh
+
+EXPOSE 5050
+
+ENTRYPOINT sh /start.sh
